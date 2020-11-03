@@ -1,0 +1,12 @@
+[submodule "testes"]
+	path = testes
+	url = https://github.com/disruptek/testes
+	branch = master
+[submodule "frosty"]
+	path = frosty
+	url = https://github.com/disruptek/frosty
+	branch = master
+[submodule "supersnappy"]
+	path = supersnappy
+	url = https://github.com/guzba/supersnappy
+	branch = master
