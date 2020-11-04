@@ -2,6 +2,7 @@ import std/times
 import std/strutils
 
 import testes
+import carnac
 
 testes:
   func fib(x: int): int {.carnac.} =

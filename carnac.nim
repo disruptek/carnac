@@ -47,7 +47,7 @@ proc replacedSymsWithIdents(n: NimNode): NimNode =
 
 let dir = getEnv("XDG_RUNTIME_DIR", ".") / ".carnac"
 
-proc loadCache[T](table: var T; name: string; sig: string): bool =
+proc loadCache*[T](table: var T; name: string; sig: string): bool =
   ## true if we read cached data from disk
   let fn = dir / addFileExt(name & "-" & sig, "frosty")
   createDir dir
@@ -55,7 +55,7 @@ proc loadCache[T](table: var T; name: string; sig: string): bool =
   if result:
     thaw(uncompress readFile(fn), table)
 
-proc storeCache[T](table: T; name: string; sig: string) =
+proc storeCache*[T](table: T; name: string; sig: string) =
   let fn = dir / addFileExt(name & "-" & sig, "frosty")
   createDir dir
   writeFile fn, compress(freeze table)
@@ -81,7 +81,7 @@ macro carnac*(n: typed) =
 
   let table = genSym(nskVar, "carnac")
   var cache = nnkBracketExpr.newTree bindSym"Table"
-  cache.add ident"Hash"
+  cache.add bindSym"Hash"
   cache.add ident(repr returnType)
   result.add:
     nnkVarSection.newTree:
@@ -99,9 +99,14 @@ macro carnac*(n: typed) =
   result.add newCall(bindSym"addExitProc", exit)
 
   var save = newStmtList()
-  args = newCall(ident"hash", args)
+  let hash = genSym(nskLet, "hash")
+  save.add:
+    nnkLetSection.newTree:
+      newIdentDefs(hash, newEmptyNode(), newCall(bindSym"hash", args))
+  save.add newIfStmt (newCall(bindSym"contains", table, hash),
+                      nnkReturnStmt.newTree newCall(bindSym"[]", table, hash))
   save.add copyNimTree(n.body).replacedSymsWithIdents
-  save.add newCall(ident"[]=", table, args, ident"result")
+  save.add newCall(bindSym"[]=", table, hash, ident"result")
 
   result.add newProc(ident $n.name, toSeq n.params.replacedSymsWithIdents,
                      body = save, pragmas = n.pragma)
