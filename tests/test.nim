@@ -3,8 +3,7 @@ import carnac
 
 {.experimental: "strictFuncs".}
 
-#testes:
-when true:
+testes:
   func fib1(x: int): int =
     case x
     of 0: 1
