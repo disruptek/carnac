@@ -120,9 +120,7 @@ macro carnac*(n: typed) =
   # add the cache read and cache write to the func body
   var save = newStmtList()
   let hash = genSym(nskLet, "hash")
-  save.add:
-    nnkLetSection.newTree:
-      newIdentDefs(hash, newEmptyNode(), newCall(bindSym"hash", args))
+  save.add newLetStmt(hash, newCall(bindSym"hash", args))
   save.add newIfStmt (newCall(bindSym"contains", table, hash),
                       nnkReturnStmt.newTree newCall(bindSym"[]", table, hash))
   save.add copyNimTree(n.body).replacedSymsWithIdents
