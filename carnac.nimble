@@ -1,6 +1,6 @@
 version = "0.0.1"
 author = "disruptek"
-description = "magical function memoization across runtimes"
+description = "magical function memoization across invocations"
 license = "MIT"
 
 requires "https://github.com/disruptek/criterion < 1.0.0"
@@ -29,4 +29,4 @@ task test, "run tests for ci":
   execTest("tests/test.nim")
 
 task bench, "generate benchmark":
-  exec "termtosvg docs/bench.svg --max-frame-duration=3000 --loop-delay=3000 --screen-geometry=80x30 --template=window_frame_powershell --command=\"nim c --gc:arc --define:danger -r tests/bench.nim\""
+  exec """demo docs/demo.svg "nim c --out=\$1 tests/test.nim""""
