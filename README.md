@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/disruptek/carnac?style=flat)](#license)
 [![buy me a coffee](https://img.shields.io/badge/donate-buy%20me%20a%20coffee-orange.svg)](https://www.buymeacoffee.com/disruptek)
 
-Magical function memoization across runtimes.
+Magical function memoization across program invocations.
 
 ## Usage
 

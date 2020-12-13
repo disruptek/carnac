@@ -73,9 +73,14 @@ proc storeCache[T](table: T; name: string; sig: string) =
 macro carnac*(n: typed) =
   ## apply to a func in order to cache its results
 
+  # to support clyybber's carnac: syntax
+  var n = n
+  if n.kind == nnkStmtList:
+    n = n[0]
+
   # this is pretty aggressive; we can loosen it later
   if n.kind != nnkFuncDef:
-    hint "carnac can only consume funcs"
+    hint "carnac can only consume funcs, not " & $n.kind
     return n
 
   # collect the details of the func; args, return type, etc.
