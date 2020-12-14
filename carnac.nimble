@@ -27,5 +27,5 @@ proc execTest(test: string) =
 task test, "run tests for ci":
   execTest("tests/test.nim")
 
-task bench, "generate benchmark":
-  exec """demo docs/demo.svg "nim c --out=\$1 tests/test.nim""""
+task demo, "generate demo":
+  exec """demo docs/demo.svg "nim c --gc:arc --define:danger --out=\$1 tests/test.nim""""

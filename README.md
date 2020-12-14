@@ -8,13 +8,71 @@
 
 Magical function memoization across program invocations.
 
-## Usage
+## How It Works
 
-1. Add the `carnac` pragma to your `func` definitions.
-1. Run your program and invoke your `func` -- it's slow.
-1. Run your program and invoke your `func` -- it's fast.
-...
-1. Profit!
+1. During compilation, we define a table holding the hash of inputs and
+their outputs for each `func` with the `.carnac.` pragma.
+1. At runtime, we attempt to load the table from a file in
+`$XDG_RUNTIME_DIR/.carnac`, named according to the `func` signature.
+1. We use the table as a cache for subsequent calls, updating it when necessary.
+1. At program exit, we store the table to disk using `frosty` and `supersnappy`.
+
+## Demo
+
+This example is from [the test in the tests/
+subdirectory](https://github.com/disruptek/carnac/blob/master/tests/test.nim).
+The program caches 1,125 bytes of data to disk.
+
+```nim
+import testes
+import carnac
+
+{.experimental: "strictFuncs".}
+
+template test(fn: typed; x: int; r: int) =
+  let y = fn(x)
+  if y != r:
+    raise newException(AssertionDefect, "compute")
+
+testes:
+  block:
+    ## without carnac
+
+    func fib1(x: int): int =
+      case x
+      of 0: 1
+      of 1: 1
+      else:
+        fib1(x - 1) + fib1(x - 2)
+
+    block ten:
+      test fib1, 10, 89
+    block forty_five:
+      test fib1, 45, 1836311903
+
+  block:
+    ## with carnac
+
+    func fib2(x: int): int {.carnac.} =
+      case x
+      of 0: 1
+      of 1: 1
+      else:
+        # fib2(x - 1) + fib2(x - 2) does not work
+        let q = x - 1
+        let z = x - 2
+        # fib2(q) + fib2(z) does not work
+        let a = fib2(q) # x - 1 does not work
+        let b = fib2(z) # x - 2 does not work
+        a + b           # this works
+
+    block ten:
+      test fib2, 10, 89
+    block forty_five:
+      test fib2, 45, 1836311903
+```
+
+![demo](docs/demo.svg "demo")
 
 ## Installation
 
@@ -28,9 +86,7 @@ $ nimble install https://github.com/disruptek/carnac
 
 ## Documentation
 
-[The documentation employs Nim's `runnableExamples` feature to
-ensure that usage examples are guaranteed to be accurate. The
-documentation is rebuilt during the CI process and hosted on
+[The documentation is rebuilt during the CI process and hosted on
 GitHub.](https://disruptek.github.io/carnac/carnac.html)
 
 ## License
