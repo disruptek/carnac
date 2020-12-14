@@ -32,7 +32,13 @@ testes:
       of 0: 1
       of 1: 1
       else:
-        fib2(x - 1) + fib2(x - 2)
+        # fib2(x - 1) + fib2(x - 2) does not work
+        let q = x - 1
+        let z = x - 2
+        # fib2(q) + fib2(z) does not work
+        let a = fib2(q) # x - 1 does not work
+        let b = fib2(z) # x - 2 does not work
+        a + b           # this works
 
     block ten:
       test fib2, 10, 89
