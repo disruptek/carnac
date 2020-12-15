@@ -68,7 +68,7 @@ proc storeCache[T](table: T; name: string; sig: string) =
   ## write the cache to disk
   let fn = dir / addFileExt(name & "-" & sig, "frosty")
   createDir dir
-  writeFile fn, compress(freeze table)
+  writeFile(fn, compress(freeze table))
 
 macro carnac*(n: typed) =
   ## apply to a func in order to cache its results
