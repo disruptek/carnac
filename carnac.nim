@@ -71,7 +71,7 @@ proc storeCache[T](table: T; name: string; sig: string) =
   writeFile(fn, compress(freeze table))
 
 macro carnac*(n: typed) =
-  ## apply to a func in order to cache its results
+  ## apply to a func in order to persist its results
 
   # to support clyybber's carnac: syntax
   var n = n
@@ -100,7 +100,8 @@ macro carnac*(n: typed) =
                                           ident name.repr)
   result = newStmtList()
 
-  # setup a table to serve as our cache, with the proper key/value types
+  # setup a table to serve as our cache, with the proper key/value types.
+  # this will be exposed to the user as a global with a gensym'd name.
   let table = genSym(nskVar, "carnac")
   var cache = nnkBracketExpr.newTree bindSym"Table"
   cache.add bindSym"Hash"
@@ -109,13 +110,14 @@ macro carnac*(n: typed) =
     nnkVarSection.newTree:
       newIdentDefs(table, cache, newEmptyNode())
 
-  # add a call to load the cache at runtime
+  # add a call to load the cache when the module is loaded;
+  # that is to say, when the program is invoked.
   result.add:
     nnkDiscardStmt.newTree:
       newCall(bindSym"loadCache", table,
               newLit $n.name, newLit n.name.signatureHash)
 
-  # add a call to store the cache at program exit
+  # add a call to store the cache at program exit.
   let exit = genSym(nskProc, "exit")
   result.add newProc(exit,
     body = newCall(bindSym"storeCache", table,
