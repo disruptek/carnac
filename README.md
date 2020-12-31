@@ -2,13 +2,22 @@
 
 [![Test Matrix](https://github.com/disruptek/carnac/workflows/CI/badge.svg)](https://github.com/disruptek/carnac/actions?query=workflow%3ACI)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/disruptek/carnac?style=flat)](https://github.com/disruptek/carnac/releases/latest)
-![Minimum supported Nim version](https://img.shields.io/badge/nim-1.4.2%2B-informational?style=flat&logo=nim)
+![Minimum supported Nim version](https://img.shields.io/badge/nim-1.5.1%2B-informational?style=flat&logo=nim)
 [![License](https://img.shields.io/github/license/disruptek/carnac?style=flat)](#license)
 [![buy me a coffee](https://img.shields.io/badge/donate-buy%20me%20a%20coffee-orange.svg)](https://www.buymeacoffee.com/disruptek)
 
 Magical function memoization across program invocations.
 
+## Does It Work?
+
+No, due to a subtle compiler bug with `typed` macros. This repository is in
+fact a canary with which we can monitor progress on said bug.  The original
+bug surfaced in https://github.com/disruptek/cps but due to the complexity
+of that code, we need a simpler reproduction such as this.
+
 ## How It Works
+
+I mean, assuming it works, which it doesn't, this is how it works:
 
 1. During compilation, we define a table holding the hash of inputs and
 their outputs for each `func` with the `.carnac.` pragma.
@@ -16,6 +25,9 @@ their outputs for each `func` with the `.carnac.` pragma.
 `$XDG_RUNTIME_DIR/.carnac`, named according to the `func` signature.
 1. We use the table as a cache for subsequent calls, updating it when necessary.
 1. At program exit, we store the table to disk using `frosty` and `supersnappy`.
+
+And, like, if you take the macro output and compile it indirectly, it _does_
+work. 😉
 
 ## Demo
 

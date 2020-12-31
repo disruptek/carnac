@@ -6,26 +6,13 @@ license = "MIT"
 requires "https://github.com/disruptek/criterion < 1.0.0"
 requires "https://github.com/disruptek/frosty < 1.0.0"
 requires "https://github.com/guzba/supersnappy < 2.0.0"
-requires "https://github.com/disruptek/testes < 1.0.0"
-
-proc execCmd(cmd: string) =
-  echo "exec: " & cmd
-  exec cmd
-
-proc execTest(test: string) =
-  when getEnv("GITHUB_ACTIONS", "false") != "true":
-    execCmd "nim c -r -f " & test
-    when (NimMajor, NimMinor) >= (1, 2):
-      execCmd "nim c -d:danger --gc:arc -r -f " & test
-  else:
-    execCmd "nim c   -d:danger -r -f " & test
-    execCmd "nim cpp -d:danger -r -f " & test
-    when (NimMajor, NimMinor) >= (1, 2):
-      execCmd "nim c   -d:danger --gc:arc -r -f " & test
-      execCmd "nim cpp -d:danger --gc:arc -r -f " & test
+requires "https://github.com/disruptek/testes >= 0.7.13 & < 1.0.0"
 
 task test, "run tests for ci":
-  execTest("tests/test.nim")
+  when defined(windows):
+    exec "testes.cmd"
+  else:
+    exec findExe"testes"
 
 task demo, "generate demo":
   exec """demo docs/demo.svg "nim c --gc:arc --define:danger --out=\$1 tests/test.nim""""
