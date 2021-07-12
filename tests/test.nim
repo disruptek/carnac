@@ -1,4 +1,4 @@
-import testes
+import balls
 import carnac
 
 {.experimental: "strictFuncs".}
@@ -8,7 +8,7 @@ template test(fn: typed; x: int; r: int) =
   if y != r:
     raise newException(AssertionDefect, "compute")
 
-testes:
+suite "carnac":
   block:
     ## without carnac
 
