@@ -12,9 +12,9 @@ when not defined(release):
 
 task test, "run tests for ci":
   when defined(windows):
-    exec "testes.cmd"
+    exec "balls.cmd"
   else:
-    exec findExe"testes"
+    exec findExe"balls"
 
 task demo, "generate demo":
   exec """demo docs/demo.svg "nim c --gc:arc --define:danger --out=\$1 tests/test.nim""""
